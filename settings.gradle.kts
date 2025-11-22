@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "java_javascript_projects"
-include("app")
+include("task1_liquid_sorting")
