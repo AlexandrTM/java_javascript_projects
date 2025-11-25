@@ -3,3 +3,17 @@
 
 # Ignore Gradle build output directory
 build
+
+# Игнорировать папку node_modules во ВСЕХ подпроектах
+**/node_modules/
+
+# Игнорировать скомпилированные JS файлы (TypeScript)
+**/dist/
+
+# Игнорировать файлы блокировки
+package-lock.json
+yarn.lock
+
+# Java/Gradle
+.gradle/
+/build/
