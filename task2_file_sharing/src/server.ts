@@ -10,6 +10,11 @@ const fileService = new FileService();
 const MAX_BYTES = 1 * 1024 * 1024;
 const MAX_MB = MAX_BYTES / (1024 * 1024);
 
+function fixMojibake(corruptedString: string): string {
+    const buffer = Buffer.from(corruptedString, 'latin1');
+    return buffer.toString('utf8');
+}
+
 const server = http.createServer((req, res) => {
     // CORS заголовки (если frontend и backend на разных портах, здесь они на одном)
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -48,7 +53,8 @@ const server = http.createServer((req, res) => {
         });
         
         bb.on('file', (name, file, info) => {
-            const metadata = fileService.createFileMetadata(info.filename, info.mimeType);
+            const correctedFilename = fixMojibake(info.filename);
+            const metadata = fileService.createFileMetadata(correctedFilename, info.mimeType);
             const writeStream = fs.createWriteStream(metadata.path);
 
             // Обработка ошибки, если busboy остановит поток
@@ -89,11 +95,20 @@ const server = http.createServer((req, res) => {
             return;
         }
 
+        const encodedFilename_RFC = encodeURIComponent(metadata.filename);
+    
+        const filename_Legacy = metadata.filename.replace(/"/g, '').replace(/;/g, '');
+        const encodedFilename_Legacy = encodeURIComponent(filename_Legacy);
+        
+        const contentDisposition = `attachment; ` +
+                               `filename="${encodedFilename_Legacy}"; ` +
+                               `filename*=UTF-8''${encodedFilename_RFC}`;
+
         const stat = fs.statSync(metadata.path);
         res.writeHead(200, {
             'Content-Type': metadata.mimeType,
             'Content-Length': stat.size,
-            'Content-Disposition': `attachment; filename="${encodeURIComponent(metadata.filename)}"`
+            'Content-Disposition': contentDisposition
         });
 
         const readStream = fs.createReadStream(metadata.path);

@@ -15,7 +15,7 @@ const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
 const METADATA_FILE = path.join(__dirname, '..', 'metadata.json');
 // Время жизни файла без скачиваний (например, 30 дней).
 const FILE_LIFE_TIME_MS = 30 * 24 * 60 * 60 * 1000;
-//const FILE_LIFE_TIME_MS = 20 * 1000;
+//const FILE_LIFE_TIME_MS = 10 * 1000;
 
 export class FileService {
     // Хранилище метаданных в памяти
