@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Sharing Service</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>File Sharing</h1>
+        <p>Upload a file to get a temporary link.</p>
+
+        <div class="upload-box">
+            <input type="file" id="fileInput">
+            <button id="uploadBtn" onclick="uploadFile()">Upload</button>
+        </div>
+
+        <div id="progressContainer" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="statusText">0%</span>
+        </div>
+
+        <div id="resultContainer" class="hidden">
+            <p>File Uploaded!</p>
+            <div class="link-box">
+                <input type="text" id="fileLink" readonly>
+                <button onclick="copyLink()">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/client.js"></script>
+</body>
+</html>
