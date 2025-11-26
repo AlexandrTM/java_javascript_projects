@@ -16,19 +16,31 @@ export class OpenMeteoService implements IWeatherService {
     }
 
     private async getForecast(lat: number, lon: number): Promise<IWeatherData> {
-        // Получаем данные на 24 часа (обычно API отдает больше, фильтруем при необходимости)
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m&forecast_days=1`;
+        // Берем прогноз на два дня, т.к. нам нужно 24 ближайших часа, непросто 24 часа текущего дня
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m&forecast_days=2`;
         const response = await axios.get(url);
         
         const { time, temperature_2m } = response.data.hourly;
 
+        // Находим текущий час в формате ISO
+        const now = new Date();
+        const isoHour = now.toISOString().slice(0, 13) + ":00"; 
+
+        const startIndex = time.indexOf(isoHour);
+        if (startIndex === -1) {
+            throw new Error("Current hour not found in Open-Meteo data");
+        }
+
+        // Берем 24 часа начиная от текущего часа
+        const next24HoursTime = time.slice(startIndex, startIndex + 24);
+        const next24HoursTemperature = temperature_2m.slice(startIndex, startIndex + 24);
+
         return {
-            time: time,
-            temperature: temperature_2m
+            time: next24HoursTime,
+            temperature: next24HoursTemperature
         };
     }
 
-    // Основной публичный метод
     public async getWeather(city: string): Promise<IWeatherData> {
         const coords = await this.getCoordinates(city);
         return await this.getForecast(coords.latitude, coords.longitude);
